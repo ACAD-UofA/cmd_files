@@ -1,0 +1,44 @@
+# Wikipage: https://wiki.adelaide.edu.au/hpc
+# Support email: hpcsupport@adelaide.edu.au
+
+
+
+# Disk usage
+rcdu
+
+
+
+# Job template (leave the "#" signs, they are part of the script)
+
+#!/bin/bash
+#SBATCH -p batch #SBATCH -N 1
+#SBATCH -n 1
+#SBATCH --time=00:01:00 #SBATCH --mem=5MB
+# Notification
+#SBATCH --mail-type=ALL
+#SBATCH --mail-user=YourEmailAddress
+module load Python/3.6.1-foss-2016b
+python histo.py
+
+
+
+# Submit a job
+sbatch job.sh
+
+# Get jobs in the queue
+squeue -u $USER
+
+# Job statistics
+rcstat <JOB_ID>
+
+# Cancel job
+scancel <JOB_ID>
+
+# Get job info
+sacct -j <JOB_ID>
+
+# Get job info
+scontrol show job <JOB_ID>
+
+# Get share info
+sshare –u $USER

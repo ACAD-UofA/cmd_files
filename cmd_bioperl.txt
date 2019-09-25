@@ -1,0 +1,56 @@
+### Install
+## Get last stable version of Perl
+# Check which version is installed
+perl -v
+# Check last version on http://www.perl.org/get.html
+# Download binaries then
+sudo sh Configure -de
+sudo make
+sudo make test
+sudo make install
+
+## Get last version of BioPerl
+# Upgrade CPAN
+sudo perl -MCPAN -e shell
+install Bundle::CPAN
+q
+# Install/upgrade Module::Build, and make it your preferred installer: 
+sudo perl -MCPAN -e shell
+install Module::Build
+o conf prefer_installer MB
+o conf commit
+q
+# Install BioPerl
+sudo perl -MCPAN -e shell
+d /bioperl/
+# Gives a list of available versions like:
+#Distribution    BOZO/Fry-Lib-BioPerl-0.15.tar.gz
+#Distribution    CJFIELDS/BioPerl-1.6.1.tar.gz
+#Distribution    CJFIELDS/BioPerl-1.6.901.tar.gz
+#Distribution    CJFIELDS/BioPerl-1.6.923.tar.gz
+#Distribution    CJFIELDS/BioPerl-1.6.924.tar.gz
+#Distribution    CJFIELDS/BioPerl-DB-1.006900.tar.gz
+#Distribution    CJFIELDS/BioPerl-Network-1.006902.tar.gz
+#Distribution    CJFIELDS/BioPerl-Run-1.006900.tar.gz
+#Distribution    CJFIELDS/Dist-Zilla-PluginBundle-BioPerl-0.02.tar.gz
+#Distribution    CRAFFI/Bundle-BioPerl-2.1.8.tar.gz
+#Distribution    RBUELS/Dist-Zilla-PluginBundle-Bioperl-0.01.tar.gz
+
+# Choose appropriate version then
+install CJFIELDS/BioPerl-1.6.924.tar.gz
+
+# If some non-essential scripts are failing then
+force install C/CJ/CJFIELDS/BioPerl-1.6.0.tar.gz
+
+## Install BioPerl_Run
+install CJFIELDS/BioPerl-Run-1.006900.tar.gz
+
+# If some packages are missing, like:
+#	File::Sort is not installed
+#	IPC::Run is not installed
+#	XML::Twig is not installed
+
+# Then, install using CPAN:
+sudo perl -MCPAN -e 'install XML::Twig'
+sudo perl -MCPAN -e 'install File::Sort'
+sudo perl -MCPAN -e 'install IPC::Run'

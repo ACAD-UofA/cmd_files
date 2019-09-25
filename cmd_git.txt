@@ -1,0 +1,89 @@
+
+### Clone online repo
+# From an internet browser, go to the GitHub/Bitbucket/GitLab repository and copy the https address
+# Go to the folder on your computer where you want to store the repository and clone the repository
+git clone [paste the address]
+
+# Always update the repository on your computer before pushing anything
+git pull
+
+# After you modify the repository on your computer
+# If you created a new file or edited a file
+git add [path to new/edited file]
+git commit -m "your commit message"
+git push
+
+# e.g.
+git pull
+git commit -m "Add ACAD2 guest account logins" cmd_NetworkConnections.txt
+git push -u origin master # only the first time
+git push
+git log
+git show e53bf9023f12472f294669ce8efeeffa2730e747
+
+
+
+### From Python workshop
+## Git
+git config --global user.name "Julien Soubrier"
+git config --global user.email "juilen.soubrier@gmail.com"
+#git config --global color.ui "auto" #might be the default already
+# TextWrangler as default text editor for -m option of commit
+git config --global core.editor "edit -w"
+git config --global core.editor "subl -n -w"
+git config --list
+
+git init
+git add
+git commit
+git status
+git diff
+
+
+
+### From GitLab website
+##Command line instructions
+
+#Git global setup
+git config --global user.name "jsoubrier"
+git config --global user.email "julien.soubrier@gmail.com"
+
+#Create a new repository
+git clone https://gitlab.com/jsoubrier/test.git
+cd test
+touch README.md
+git add README.md
+git commit -m "add README"
+git push -u origin master
+
+#Existing folder or Git repository
+cd existing_folder
+git init
+# if existing remote repository, remove using:
+git remote rm origin
+git remote add origin https://gitlab.com/jsoubrier/test.git
+git add .
+git commit
+git push -u origin master
+
+<<<<<<< HEAD
+
+
+### Tricks
+# Combine add and commit with a 'git alias'
+git config --global alias.add-commit '!git add -A && git commit'
+git add-commit -m 'My commit message'
+=======
+## Create new repository in Bitbucket from existing local project
+# In project folder:
+git init
+git add .
+git commit
+
+# https://bitbucket.org/repo/create
+# Then 'I have an existing project', and follow cmds, e.g.:
+git remote add origin https://jsoubrier@bitbucket.org/jsoubrier/rosalind.git
+git push -u origin --all
+git push -u origin --tags
+git status
+>>>>>>> 23537d3167848bf0cabdd09e7a85daf0e3c276af

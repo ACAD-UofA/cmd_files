@@ -1,0 +1,11 @@
+mkdir 5_Complexity
+cd 5_Complexity
+
+
+###Complexity estimate
+
+for i in ../3_Map_BWA_AdapterRemovalPE_sabre/*R1R2_Collapsed_QualMap30_Sort.bam; do \
+COUNT=`samtools view -c $i`; \
+STEP=`echo "scale=2; $COUNT/10" | bc`; \
+preseq c_curve -v  -s $STEP -o $(basename "${i/_QualMap30_Sort\.bam/_complexity.txt}") -B $i 2> $(basename "${i/_QualMap30_Sort\.bam/_complexity_summary.txt}"); \
+done

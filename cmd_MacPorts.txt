@@ -1,0 +1,58 @@
+### MacPorts
+## needs to go through Wifi to avoid proxy issues (SystPreferences/Network/Ethernet/Make service inactive)
+
+# Search for available packages
+port list
+port search gsl
+
+# Install a package
+#for R, first uninstall any R version installed with macports:
+#sudo port uninstall R
+#sudo port uninstall R-framework
+#sudo port clear R-framework
+#sudo port -s install R-framework +gcc46
+sudo port install R
+sudo port install gsl
+
+# Also available
+sudo port install virtualbox
+sudo port install pdftk
+sudo port install HandBrake
+sudo port install vlc
+sudo port install MenuMeters
+sudo port install pigz
+sudo port install samtools
+
+
+# Check what's installed through MacPorts
+port installed
+
+
+
+
+
+
+
+
+### PROXY - NOT WORKING!!
+
+sudo visudo
+# append next line to the list of 'Default' with command 'a'
+Defaults        env_keep += "http_proxy HTTP_PROXY ftp_Proxy FTP_PROXY rsync_proxy RSYNC_PROXY"
+ESC and save with ':wq'
+# Export proxy settings (special character table: http://www.w3schools.com/tags/ref_urlencode.asp)
+export http_proxy=http://a1186063:Ofor%3Btoutou%29%2809@www-proxy.adelaide.edu.au:3128
+export HTTP_PROXY=http://a1186063:Ofor%3Btoutou%29%2809@www-proxy.adelaide.edu.au:3128
+
+export ftp_proxy=ftp://a1186063:Ofor%3Btoutou%29%2809@www-proxy.adelaide.edu.au:3128
+export FTP_PROXY=ftp://a1186063:Ofor%3Btoutou%29%2809@www-proxy.adelaide.edu.au:3128
+
+export rsync_proxy=a1186063:Ofor%3Btoutou%29%2809@www-proxy.adelaide.edu.au:3128
+export RSYNC_PROXY=a1186063:Ofor%3Btoutou%29%2809@www-proxy.adelaide.edu.au:3128
+
+# to check:
+env
+
+# to erase environment variables:
+unset http_proxy HTTP_PROXY ftp_proxy FTP_PROXY rsync_proxy RSYNC_PROXY
+

@@ -1,0 +1,299 @@
+#Clusters available:
+#acad1
+bllamas@acad.ersa.edu.au
+#acad2
+a1185467@acad2.rc.adelaide.edu.au
+#orchestra
+wh69@orchestra.med.harvard.edu
+
+#Create public/private keys
+ssh-keygen -t rsa
+#Press Return for default location /Users/bastien/.ssh/id_rsa
+#Enter password and press Return
+#Copy the public key on the remote systems
+scp ~/.ssh/id_rsa.pub bllamas@acad.ersa.edu.au:
+scp ~/.ssh/id_rsa.pub a1185467@acad2.rc.adelaide.edu.au:
+#Log into the remote system acad.ersa.edu.au
+ssh bllamas@acad.ersa.edu.au
+#Add public key (create authorized_keys file if needed: touch ~/.ssh/authorized_keys)
+cat id_rsa.pub >> .ssh/authorized_keys
+#Check the content of authorized_keys
+less .ssh/authorized_keys
+#Delete the public key
+rm id_rsa.pub
+#Log into the remote system acad2.rc.adelaide.edu.au
+ssh a1185467@acad2.rc.adelaide.edu.au
+#Add public key (create authorized_keys file if needed: touch ~/.ssh/authorized_keys)
+cat id_rsa.pub >> .ssh/authorized_keys
+#Check the content of authorized_keys
+less .ssh/authorized_keys
+#Delete the public key
+rm id_rsa.pub
+#Go back to local system and create config file
+vim ~/.ssh/config
+#Write:
+Host acad
+HostName acad.ersa.edu.au
+User bllamas
+ServerAliveInterval 60
+
+Host acad2
+HostName acad2.rc.adelaide.edu.au
+User a1185467
+ServerAliveInterval 60
+#Use ssh acad or ssh acad2 to log into remote systems
+#You will need to enter the password only the first time you log into the remote systems
+
+#Create screen session
+screen -S session_name
+#list screen sessions
+screen -list
+#for commands within screen, type ctrl+A then relevant option
+#to detach screen session: ctrl+A then d
+#to reattach screen
+screen -r session_name
+#exit screen session (from session). It will kill the session if nothing runs
+exit
+#basic screen commands
+Ctrl-a c 			Create new window (shell)
+Ctrl-a k 			Kill the current window
+Ctrl-a w			List all windows (the current window is marked with "*")
+Ctrl-a 0-9 			Go to a window numbered 0-9
+Ctrl-a n 			Go to the next window
+Ctrl-a Ctrl-a 		Toggle between the current and previous window
+Ctrl-a [ 			Start copy mode
+Ctrl-a ] 			Paste copied text
+Ctrl-a ? 			Help (display a list of commands)
+Ctrl-a Ctrl-\ 		Quit screen
+Ctrl-a D (Shift-d) 	Power detach and logout
+Ctrl-a d 			Detach but keep shell window open
+
+#Parallel loop in bash
+for i in a b c d e f; do
+	echo "$i" &
+done
+
+#Parallel loop in bash in N-processes batches
+N=8
+(
+for i in a b c d e f; do
+	((i=i%N)); ((i++==0)) && wait
+	echo "$i" &
+done
+)
+
+#Create symbolic link
+ln -s /path/to/file /path/to/symlink
+
+#Find and compress files
+find . -name "*.trees" | xargs pigz
+
+#Find and delete files and directories
+find . -name 'string' -exec rm -r {} +
+
+#Size of directories
+du -skh *
+
+#Size of disks
+df -h
+
+#rsync
+rsync -auv SOURCE DESTINATION
+
+#sftp transfer from QBI
+sftp qbisftp@sftp.qbi.uq.edu.au
+#password: qbisftp
+cd incoming.data/Janette
+#same commands as unix (ls, pwd, mkdir, rm) in remote location
+#add 'l' for local (lls, lpwd, lmkdir)
+#download one file
+get remote_file [local/path]
+#download multiple files
+mget *remote_files [local/path]
+#quit
+quit
+
+#Copy files to RDSI storage (not in use anymore; now use /rdsi/acad/)
+ssh acad
+ssh tizard2
+cd /mnt/hnas/acad
+scp -r acad:/path/to/acad/folder/ ./path/to/tizard2/folder/
+
+#kill multiple processes at once
+kill `ps -u bllamas | grep process_name | awk '{print $1}'`
+
+# Read file
+more -ds file
+# -d: message "[Press space to continue, 'q' to quit.]"
+# -s: squeeze multiple blank lines into one
+
+# Read first lines of a file:
+head -n file
+# (n is the number of lines)
+head -n big_dataset > small_file
+# Creates a smaller dataset from the first n lines of a big dataset:
+
+# Compress/uncompress files:
+gzip file
+gunzip file.gz
+gunzip -c file.gz
+# Read without decompressing file (decompress on the fly)
+
+# Concatenate files:
+cat file1 file2 file3 > cat_files
+cat file* > cat_files
+cat file1 file2 | gzip > cat_files.gz
+
+# Copy file from remote server
+scp -r bllamas@acad.ersa.edu.au:/myfolder to/local/folder
+
+# Count the occurence of a character
+grep char -o filename | wc -l
+
+#Replace all lines starting with ">" and followed by any character by ">my_new_line"
+sed 's/^>.*$/>my_new_line/g" file1 > file2
+
+#Rename fasta headers by changing fields (separater is '_')
+awk -F'[_]' '{printf $4"_"$1"_"$2"_"$3;for(i=5;i<=NF;i++) printf "_"$i}{printf "\n"}' in.fasta > out.fasta
+
+#multi-lines fasta to one-line fasta
+awk '/^>/ {printf("\n%s\n",$0);next; } { printf("%s",$0);}  END {printf("\n");}' in.fasta | tail -n +2 > out.fasta
+
+#Sort multi fasta file
+sed -e '/>/s/^/@/' -e '/>/s/$/#/' file.fasta | tr -d "\n" | tr "@" "\n" | sort -t "_" -k2n | tr "#" "\n" | sed -e '/^$/d'
+
+#Display file names with a specific extension, all in one columns
+ls -lS *.extension | awk {'print$9'}
+
+#Getting genome coordinates from refseq
+mysql  -h  genome-mysql.cse.ucsc.edu -A -u genome -D hg19 -e 'select * from refGene where name="NG_007278"\G'
+
+#In a lengthy command line, change a typo (old) for the right info (new). !! calls the last command.
+!!:gs/old/new
+
+#Refresh .bash_profile without opening a new terminal
+source .bash_profile
+
+#Compare two files
+comm [-1] [-2] [-3 ] file1 file2
+#output column 1 is lines unique to file1
+#output column 2 is lines unique to file2
+#output column 3 is lines duplicated in file1 and file2
+#options [-1], [-2] and [-3 ] suppress columns 1, 2 and 3 respectively
+
+#Removes duplicate lines in file1 and outputs results to file2
+uniq file1 > file2
+#Other method
+awk '!a[$0]++' file1 > file2
+
+#Removes duplicate lines in file1 based on columns 1, 2 and 3 and outputs results to file2
+awk '!a[$1,$2,$3]++' file1 > file2
+
+#fastq to fasta
+zcat input_file.fastq.gz | awk 'NR%4==1{printf ">%s\n", substr($0,2)}NR%4==2{print}' > output_file.fasta
+
+#Reads length distribution of fastq files:
+cat reads.fastq | awk '{if(NR%4==2) print length($1)}' | sort -n | uniq -c > read_length.txt
+
+#Scott Hunicke-Smith's list of linux one-liners 
+#https://wikis.utexas.edu/display/bioiteam/Scott%27s+list+of+linux+one-liners
+# Find out if you have some unusually abundant sequences in the first 30nt (in the first 25k fastq reads)
+head -100000 seqs.fastq | grep -A 1 '^@HWI' | grep -v '^@HWI' | sort | uniq -c -w 30 | sort -n -r | head
+# Find out if you have an expected constant motif between positions 12 and 22 (in the first 25k fastq reads)
+head -100000 seqs.fastq | grep -A 1 '^@HWI' | grep -v '^@HWI' | awk '{print substr($1,12,10)}' | sort | uniq -c | sort -n -r | head
+# Globally change the names of all your references in a sam file
+cat notrrna.genome.sam | awk 'BEGIN {FS="\t"; OFS="\t"} \
+   {if ($3=="mitochondria") {$3="ChrM"} if ($3=="chloroplast") {$3="ChrC"} \
+   if ($3=="2") {$3="Chr2"} if ($3=="1") {$3="Chr1"}  if ($3=="3") {$3="Chr3"}  \
+   if ($3=="4") {$3="Chr4"}  if ($3=="5") {$3="Chr5"}  \
+   print}' > notrrna.genome.tair.sam
+# Change one reference name in a bam file
+samtools view -h notrrna.genome.bam | sed s/'mitochondria'/'ChrM'/g | samtools view -S -b - > blah.bam
+#convert BAM to fastq
+samtools view input.bam | awk 'BEGIN {FS="\t"} {print "@" $1 "\n" $10 "\n+\n" $11}' > output.bam.fastq
+#convert BAM to fasta
+samtools view input.bam | awk 'BEGIN {FS="\t"} {print ">" $1 "\n" $10}' > output.bam.fasta
+
+#from http://gettinggeneticsdone.blogspot.com.au/2012/04/awk-command-to-count-total-unique-and.html
+cat myfile.fq | awk '((NR-2)%4==0){read=$1;total++;count[read]++}END{for(read in count){if(!max||count[read]>max) {max=count[read];maxRead=read};if(count[read]==1){unique++}};print total,unique,unique*100/total,maxRead,count[maxRead],count[maxRead]*100/total}'
+#The output would look something like this for some RNA-seq data downloaded from the Galaxy RNA-seq tutorial:
+#99115 60567 61.1078 ACCTCAGGA 354 0.357161
+#This is telling you:
+#    The total number of reads (99,115).
+#    The number of unique reads (60,567).
+#    The frequency of unique reads as a proportion of the total (61%).
+#    The most abundant sequence (useful for finding adapters, linkers, etc).
+#    The number of times that sequence is present (354).
+#    The frequency of that sequence as a proportion of the total number of reads (0.35%).
+#If you have a handful of fastq files in a directory and you'd like to do this for each of them, you can wrap this in a for loop in bash:
+for read in `ls *.fq`; do echo -n "$read "; awk '((NR-2)%4==0){read=$1;total++;count[read]++}END{for(read in count){if(!max||count[read]>max) {max=count[read];maxRead=read};if(count[read]==1){unique++}};print total,unique,unique*100/total,maxRead,count[maxRead],count[maxRead]*100/total}' $read; done
+#This does the same thing, but adds an extra field at the beginning for the file name. I haven't yet figured out how to wrap this into GNU parallel, but the for loop should do the trick for multiple files.
+
+#http://rous.mit.edu/index.php/Manipulate_alignment_files_using_UNIX_commands
+# how many alignments? 
+wc -l myfile.sam
+# how many reads? 
+cut -f 1 myfile.sam | sort | uniq | wc -l
+# how many distinct sequences? 
+cut -f 10 myfile.sam | sort | uniq | wc -l
+# how many reads are uniquely mapped? 
+cut -f 1 myfile.sam | sort | uniq -u | wc -l
+# how many reads are multi-hits? 
+cut -f 1 myfile.sam | sort | uniq -d | wc -l
+# how many alignments are there for each read? 
+cut -f 1 myfile.sam | sort | uniq -c
+# top 10 reads that have the most reported alignments 
+cut -f 1 myfile.sam | sort | uniq -c | sort -nr | head
+# top 10 reads that have the most reported alignments (other method)
+grep -o "NH:i:[[:digit:]]*" myfile.sam | sort -n -k 1.6 | tail
+# what chromosome are there? 
+cut -f 3 myfile.sam | sort | uniq
+# what chromosome are there (in numerical chromosome order, assuming chr1, chr2, etc)?
+cut -f 3 myfile.sam | sort -k 1.4 -n | uniq
+# count the occurrences by chromosome (in numerical chromosome order, assuming chr1, chr2, etc)
+cut -f 3 myfile.sam | sort -k 1.4 -n | uniq -c  
+# count the occurrences by chromosome, then sort from most to least abundant 
+cut -f 3 myfile.sam | sort | uniq -c | sort -nr
+# which chromosome is the most represented? 
+cut -f 3 myfile.sam | sort | uniq -c | sort -nr | head -n 1
+# which chromosome is the least represented? 
+cut -f 3 myfile.sam | sort | uniq -c | sort -nr | tail -n 1
+# which chromosome is the least represented? (other method)
+cut -f 3 myfile.sam | sort | uniq -c | sort -n | head -n 1
+# list the mapping flags
+cut -f 2 myfile.sam | sort | uniq
+# what is the distribution of mapping flags? 
+cut -f 2 myfile.sam | sort | uniq -c
+# what reads map on the reverse strand? 
+awk '$2 == 16' myfile.sam | cut -f 1 | uniq
+# how many reads map on the reverse strand? 
+awk '$2 == 16' myfile.sam | cut -f 1 | uniq | wc -l
+# which alignments are mapped on the reverse strand? 
+awk '$2 == 16' myfile.sam
+# how many alignments are mapped on the reverse strand? 
+awk '$2 == 16' myfile.sam | wc -l
+# extract alignments mapped to chr1 
+grep -w chr1 myfile.sam > myfile_chr1.sam
+# other method
+awk '$3~/chr1/{print}' myfile.sam > myfile_chr1.sam
+# what is the length of the reads?
+awk '{print length($10)}' myfile.sam | sort | uniq
+# distribution of mapping qualities 
+cut -f 5 myfile.sam | sort | uniq -c
+# multi-hits associated with mapping quality 0 
+awk '$5 == 0' myfile.sam | grep -o "NH:i:[[:digit:]]*" | sort -n -k 1.6 | uniq
+# multi-hits associated with mapping quality 1 
+awk '$5 == 1' myfile.sam | grep -o "NH:i:[[:digit:]]*" | sort -n -k 1.6 | uniq
+# multi-hits associated with mapping quality between 2 and 254 
+awk '$5 > 2 && $5 < 254' myfile.sam | grep -o "NH:i:[[:digit:]]*" | sort -n -k 1.6 | uniq
+# multi-hits associated with mapping quality equal to 255 
+awk '$5 == 255' myfile.sam | grep -o "NH:i:[[:digit:]]*" | sort -n -k 1.6 | uniq
+# count the alignments that have only matches/mismatches (fixed length of 60 nt)
+cut -f 6 myfile.sam  | grep -c 60M (fixed length of 60 nt)
+# this is equivalent to the command above 
+awk '$6 == "60M"' myfile.sam | wc -l
+# number of alignments that are perfect matches (edit distance = 0) 
+awk '$6 == "60M" ' myfile.sam | grep -o "NM:i:0" | wc -l
+
+# Generate bed file from reference index
+awk '{print $1, 0, $2, $1, "0", "+"}' OFS='\t' *.fasta.fai

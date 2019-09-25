@@ -1,0 +1,177 @@
+### Tizard
+
+ssh bllamas@tizard1.ersa.edu.au
+module avail
+
+
+
+#!/bin/tcsh
+
+### Job name
+#PBS -N MyJobName
+
+### Output files
+#PBS -j oe
+
+### Mail to user when job ends or aborts
+#PBS -m ae
+
+### Mail address for user
+#PBS -M Your-email-Address
+
+### Queue name
+#PBS -q tizard
+
+### Request nodes, processors, memory, walltime. NB THESE ARE REQUIRED
+#PBS -l nodes=N:ppn=P
+#PBS -l mem=Xmb,vmem=Xmb
+#PBS -l walltime=HH:MM:SS
+
+# This job's working directory
+echo Working directory is $PBS_O_WORKDIR
+cd $PBS_O_WORKDIR
+echo Running on host `hostname`
+echo Time is `date`
+echo Using nodes
+cat $PBS_NODEFILE
+
+# Load module(s) if required
+module load application
+# Run the executable
+ApplicationExe+Arguments
+
+
+
+qsub myscript.tcsh
+qstat -a
+qstat -an
+qstat -u $USER -an
+qstat
+qdel
+
+
+
+
+
+
+### Run Beast on Hydra
+
+ssh jsoubrier@hydra.sapac.edu.au
+ssh tesla.ersa.edu.au
+
+
+#!/bin/tcsh
+
+### Job name
+#PBS -N rattus_mus_cytb.xml
+### Declare jobs non-rerunable
+#PBS -r n
+### Output files
+#PBS -j oe
+### Mail to user
+#PBS -m ae
+#PBS -M julien.soubrier@adelaide.edu.au
+### Queue name
+#PBS -q hydra
+### Number of nodes
+#PBS -l nodes=1,walltime=100:00:00
+
+# This job's working directory
+cd $PBS_O_WORKDIR
+# Run the executable
+module load beast
+beast rattus_mus_cytb.xml >& outputrattus_mus_cytb.log
+
+
+scp -r /Users/juliansoubrier/adelaide_manip/rat/run_hydra jsoubrier@hydra.sapac.edu.au:~/.
+
+ssh jsoubrier@hydra.sapac.edu.au
+mac2unix rattus_mus_cytb.tsch
+qsub rattus_mus_cytb.tsch
+qstat
+
+scp -r jsoubrier@hydra.sapac.edu.au:~/run_hydra /Users/juliansoubrier/adelaide_manip/rat/run_hydra
+
+
+
+Run BayesPhy on Corvus
+
+#!/bin/tcsh
+
+### Job name
+#PBS -N bp_rattus
+### Declare jobs non-rerunable
+#PBS -r n
+### Output files
+#PBS -j oe
+### Mail to user
+#PBS -m ae
+#PBS -M julien.soubrier@adelaide.edu.au
+### Queue name
+#PBS -q corvus
+### Number of nodes
+#PBS -l nodes=1,walltime=100:00:00
+
+# This job's working directory
+cd $PBS_O_WORKDIR
+# Run the executable
+module load BayesPhylogeny
+BayesPhylogeny < bp_run
+
+
+qsub rattus_mus_robins_cytb.tsch
+
+
+#Kill a run
+qdel 611423
+
+
+ssh jsoubrier@corvus.ersa.edu.au
+
+ssh corvus.ersa.edu.au
+
+
+# CMD on Tesla supercomputer
+
+
+ssh jsoubrier@tesla.ersa.edu.au
+cd /data/users/jsoubrier
+
+
+### Run BEAST
+/opt/shared/beast/1.6.0/bin/beast Tree_$x\_1k.xml &
+
+/opt/shared/beast/1.6.1/bin/beast Tree_$x\_1k.xml &
+
+# Or sequential runs
+
+(/opt/shared/beast/1.6.1/bin/beast Tree_$x\_1k.xml;
+/opt/shared/beast/1.6.1/bin/beast Tree_$x\_1k.xml) &
+
+
+/opt/shared/beast/1.6.1/bin/beast
+
+/opt/shared/beast/1.6.1/bin/beast -threads 4
+
+
+MrBayes
+
+–np 4 /opt/shared/MrBayes/3.2-gnu-mpi/bin/mb ArthPruned_Morph202nt12_nogam_st1.mrb
+
+
+(/opt/shared/beast/1.6.1/bin/beast StarBEASTLog_Smiths_Indo_BEASTTree_HKYIG_codon_UncorrLog_1calib_50M_2codon_HKY_GTR.xml;
+/opt/shared/beast/1.6.1/bin/beast StarBEASTLog_Smiths_Indo_BEASTTree_HKYIG_codon_UncorrLog_1calib_50M_2codon_HKY_GTR_2.xml;
+/opt/shared/beast/1.6.1/bin/beast StarBEASTLog_Smiths_Indo_BEASTTree_HKYIG_codon_UncorrLog_1calib_50M_2codon_HKY_GTR_3.xml;
+/opt/shared/beast/1.6.1/bin/beast StarBEASTLog_Smiths_Indo_BEASTTree_HKYIG_codon_UncorrLog_1calib_50M_2codon_HKY_GTR_4.xml) &
+
+
+(/opt/shared/beast/1.6.1/bin/beast StarBEASTLog_Smiths_Indo_BEASTTree_HKYIG_codon_UncorrLog_1calib_50M_3codon_HKY_GTR.xml;
+/opt/shared/beast/1.6.1/bin/beast StarBEASTLog_Smiths_Indo_BEASTTree_HKYIG_codon_UncorrLog_1calib_50M_3codon_HKY_GTR_2.xml;
+/opt/shared/beast/1.6.1/bin/beast StarBEASTLog_Smiths_Indo_BEASTTree_HKYIG_codon_UncorrLog_1calib_50M_3codon_HKY_GTR_3.xml;
+/opt/shared/beast/1.6.1/bin/beast StarBEASTLog_Smiths_Indo_BEASTTree_HKYIG_codon_UncorrLog_1calib_50M_3codon_HKY_GTR_4.xml) &
+
+/opt/shared/beast/1.6.1/bin/beast H_SingleStrict_Skyride_4RelativeRates_Op_4.xml &
+
+
+
+

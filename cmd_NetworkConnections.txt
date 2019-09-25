@@ -1,0 +1,150 @@
+### Connections
+
+### SSHFS to mount server on Mac
+
+http://osxfuse.github.io/
+https://github.com/osxfuse/osxfuse/wiki/FAQ
+https://www.digitalocean.com/community/tutorials/how-to-use-sshfs-to-mount-remote-file-systems-over-ssh
+
+# Create target folder
+mkdir ~/ACAD1
+mkdir ~/ACAD2
+
+# Mount
+sshfs acad:/localscratch ~/ACAD1 -o idmap=user,cache=no,volname=ACAD1
+sshfs acad2:/localscratch ~/ACAD2 -o idmap=user,cache=no,volname=ACAD2
+
+# Unmount
+#fusermount -u ~/ACAD2
+sudo umount ~/ACAD2
+
+# Function to add to .bash_profile
+mntACAD2() {
+sshfs acad2:/localscratch/$1 ~/ACAD2 -o idmap=user,cache=no,volname=ACAD2
+}
+export -f mntACAD2
+
+# OR assign an alias
+alias mntACAD2='sshfs acad2:/localscratch ~/ACAD2 -o idmap=user,cache=no,volname=ACAD2'
+
+### Internet
+# Connect Wifi, choose UofA, enter login/password when prompted, NO PROXY
+# Plug ethernet
+- SystPreferences/Network/Ethernet/Configure IPv4 -> Using DHCP with manual address
+129.127.100.XX (find available address)
+	Advanced/Proxies
+www-proxy.adelaide.edu.au	3128
+login/password
+OK + Apply
+# or PAC file
+http://www.adelaide.edu.au/digest-proxy.pac
+# If doens't work (which will happen...) talk to Julien/Bastien
+
+### Shared Drive
+Prompt new server connection in Finder/Go/Connect to server (or cmd+k)
+smb://uofasciences.ad.adelaide.edu.au/ees/ACAD
+(click on "+" to save it as favorite)
+
+### Uni disks/system (this would allow you to access your university storage)
+Same process than for the Shared Drive
+smb://uofausers3.ad.adelaide.edu.au/users3/a1186063
+# 3 in 'users3' = last number of your uni ID
+
+### Printer
+Install the Printer Driver "bizhub_C554_108.pkg" or "C554_Series_MacOS108_v1.3.1_A4" (whichever)
+Go to System Preferences/Print&Scan
+Add
+IP
+Line Printer Daemon - LPD
+Adress: 10.66.4.43
+Print Using: Select Printer Software -> KONICA MINOLTA C554 PS
+
+
+### MacPro2
+# Terminal / Fetch
+ssh a1186063@staff-248-147.wireless.adelaide.edu.au4
+
+# Screen Sharing
+# /System/Library/CoreServices/Screen\ Sharing.app
+staff-248-040.wireless.adelaide.edu.au
+
+
+### Tesla
+ssh jsoubrier@tesla.ersa.edu.au
+cd /data/users/jsoubrier
+### Hydra
+ssh jsoubrier@hydra.sapac.edu.au
+### Tizard
+ssh jsoubrier@tizard1.ersa.edu.au
+
+
+### Ion Torrent
+http://129.127.101.43
+login and password are: ionuser
+
+
+
+### ACAD clusters (all with same data folder mounted)
+# ACAD1
+ssh aXXXXXX@acad1.rc.adelaide.edu.au
+cd /localscratch/
+cd /data/acad
+
+#ACAD2
+ssh aXXXXXX@acad2.rc.adelaide.edu.au
+cd /localscratch/
+cd /data/acad
+
+# Guest account with restricted access to /localscratch/guest-transfer/acad-guest/
+U: acad-guest
+P: Pa55w0rd!
+
+# Guest account with full access
+U: acad-colab1
+P: IrCL1+5mkN
+
+#ACAD3
+ssh aXXXXXX@acad3.rc.adelaide.edu.au
+cd /localscratch/
+cd /data/acad
+
+### UoA clusters (mounted data folder is different than for acad machines)
+# Phoenix
+ssh aXXXXXX@phoenix.rc.adelaide.edu.au
+cd /fast/users/aXXXXXX
+cd /data/acad
+
+
+## Sync Backup
+rsync -auv -e ssh /Volumes/ACAD_HD4TB/ACAD_People_Backup acad:/data/acad/
+
+## SSH setup
+# Open a terminal window on local computer
+# Go to the .ssh directory
+cd .ssh
+#Generate personal set of keys
+ssh-keygen -t rsa
+#Press enter to accept default location, then enter a password and confirm this password
+ls -lah
+# Two files id_rsa (private key) and id_rsa.pub (public key) have been created
+# Open a new terminal window and connect to ACAD cluster
+# Check that a .ssh directory exists
+ls -lah
+# If you do not see a .ssh directory, create one
+mkdir .ssh
+# Make sure the .ssh directory is accessible only to you
+chmod 700 .ssh
+# Close terminal window
+# Go back to the first terminal window
+# Copy the public key to the remote server (change the user name)
+cat ~/.ssh/id_rsa.pub | ssh bllamas@acad.ersa.edu.au "cat - >> ~/.ssh/authorized_keys"
+# Make sure the ssh-agent holds the secret key
+ssh-add
+# Enter the same password as the one you used for ssh-keygen
+# Create a .ssh/config file with the following content (change the username)
+Host acad1
+HostName acad1.rc.adelaide.edu.au
+User aXXXXXX
+ServerAliveInterval 60
+#You can now log in by using the following command (no password needed anymore)
+ssh acad1

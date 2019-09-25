@@ -1,0 +1,18 @@
+### How to set the PATH
+
+## Check for .bash_profile file in home directory
+cd
+ls -a
+# If not already present create .bash_profile file in home directory using TextWrangler for example
+
+## To open and modify .bash_profile
+cd
+open -a TextWrangler .bash_profile
+
+## Setting PATH for bin folders in .bash_profile
+export PATH="/Users/YOURHOME/YOURFOLDER1:\
+/Users/YOURHOME/YOURFOLDER2:\
+$PATH"
+
+
+

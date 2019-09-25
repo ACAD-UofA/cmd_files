@@ -1,0 +1,65 @@
+#### Build a Virtual Machine (VM) on the Nectar Cloud
+http://support.rc.nectar.org.au/docs/overview.html
+
+### Check or generate your SSH key
+## this key is unique to your computer and is used as identification between your machine and the VM
+## instructions as per (https://help.github.com/articles/generating-ssh-keys)
+
+# Check if you already have a SSH key:
+# In terminal
+cd ~/.ssh
+
+# if "No such file or directory" you need to generate a key (if you have the directory, go to the step #@@@#):
+ssh-keygen -t rsa -C "your_email@example.com"
+ssh-add id_rsa
+# enter a 'paraphrase' (easy password you will still remember in 6 months!)
+
+#@@@# copy your SSH key (same than going to ~/.ssh/ and copy the content of 'id_rsa.pub')
+pbcopy < ~/.ssh/id_rsa.pub
+
+
+### Logon the Nectar cloud dashboard to instantiate your VM
+# Go to https://dashboard.rc.nectar.org.au/
+# login with you Uni details
+# go to 'Images and Snapshots' then 'Nectar official' (top right panel) - or Public if you are after a specific type of VM
+# Select an image (here we are using the latest ubuntu version "NeCTAR Ubuntu 13.10 (Saucy) amd64 UEC") by clicking on 'Launch'
+# Give a name
+# Choose between small and medium 'flavor' (if you don't have further allocation)
+# In 'Access and Security' tick "ssh" and paste your ssh key with your computer name in 'Keypair'
+# Don't care about the rest, just launch
+
+
+### Connect to your VM
+# in 'instances' (left panel), copy the IP address once the VM is 'Active' (e.g., 130.220.208.191)
+# in terminal, ssh (connect) to your VM
+ssh ubuntu@130.220.208.191
+
+# You're done!!!
+
+
+### Run BEAST on your VM
+# Install Java
+sudo add-apt-repository ppa:webupd8team/java
+sudo apt-get update
+sudo apt-get install oracle-java7-installer
+
+# The /mnt disk has a larger capacity than the /home/ubuntu, you may prefer to use /mnt for data storage
+# Edit permissions of /mnt
+sudo chmod 777 /mnt
+# Ignore the error message sudo: unable to resolve host
+
+# Copy all necessary input files (i.e., beast jar executable, input files...)
+# From a separate terminal tab (not connected to the VM):
+scp -r /Users/julien/MyBeastFolder ubuntu@130.220.208.191:MyBeastFolder/
+
+# Run BEAST
+cd MyBeastFolder
+nohup java -Xmx4g -jar ./beast_1_7_5.jar -threads 3 Mitochondrial_cal2_6clocks_allTaxa_3.xml &
+nohup java -Xmx4g -jar ./beast_1_7_5.jar -threads 3 Mitochondrial_cal2_6clocks_noCrocs_3.xml &
+nohup java -Xmx4g -jar ./beast_1_7_5.jar -threads 3 Mitochondrial_cal2_6clocks_noTinamous_noCrocs_3.xml &
+nohup java -Xmx4g -jar ./beast_1_7_5.jar -threads 3 Mitochondrial_cal2_6clocks_noTinamous_3.xml &
+
+# Copy output files back to your computer
+# From a separate terminal tab (not connected to the VM):
+scp -r ubuntu@130.220.208.191:MyBeastFolder /Users/julien/MyBeastFolder/
+

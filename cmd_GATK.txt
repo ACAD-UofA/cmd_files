@@ -1,0 +1,75 @@
+#Create the reference fasta sequence dictionary file
+java -jar /Users/bastien/bin_app/picard-tools-1.104/picard-tools-1.104/CreateSequenceDictionary.jar \
+R=/Users/bastien/Desktop/Bastien_ACAD/NGS/Reference_genomes/REFHumanRSRS.fasta \
+O=/Users/bastien/Desktop/Bastien_ACAD/NGS/Reference_genomes/REFHumanRSRS.dict
+
+#Create the reference fasta index file
+samtools faidx /Users/bastien/Desktop/Bastien_ACAD/NGS/Reference_genomes/REFHumanRSRS.fasta
+
+
+
+for i in *Sort_Mkdup.bam; do
+
+#Add read group header to bam file
+java -jar /Users/bastien/bin_app/picard-tools-1.104/picard-tools-1.104/AddOrReplaceReadGroups.jar \
+I=$i \
+O=${i/Mkdup/Mkdup_RdGrp} \
+LB=Library PL=Platform PU=Platform_unit SM=Sample_name
+
+#Index bam file
+samtools index ${i/Mkdup/Mkdup_RdGrp}
+
+#GATK RealignerTargetCreator
+java -Xmx2g -jar /Users/bastien/bin_app/GenomeAnalysisTK-2.8-1-g932cd3a/GenomeAnalysisTK.jar \
+-T RealignerTargetCreator \
+-R /Users/bastien/Desktop/Bastien_ACAD/NGS/Reference_genomes/REFHumanRSRS.fasta \
+-I ${i/Mkdup/Mkdup_RdGrp} \
+-o ${i/\.bam/_forIndelRealigner\.intervals}
+#[-known /path/to/indels.vcf] \
+
+done
+
+
+for i in *Sort_Mkdup.bam; do
+
+#GATK IndelRealigner
+java -Xmx4g -jar /Users/bastien/bin_app/GenomeAnalysisTK-2.8-1-g932cd3a/GenomeAnalysisTK.jar \
+-T IndelRealigner \
+-R /Users/bastien/Desktop/Bastien_ACAD/NGS/Reference_genomes/REFHumanRSRS.fasta \
+-I ${i/Mkdup/Mkdup_RdGrp} \
+-targetIntervals ${i/.bam/_forIndelRealigner.intervals} \
+-o ${i/Mkdup/Mkdup_Realigned} \
+#[-known /path/to/indels.vcf] \
+#[-compress 0]    (this argument recommended to speed up the process *if* this is only a temporary file; otherwise, use the default value)
+
+done
+
+
+for i in *Sort_Mkdup.bam; do
+
+#GATK LeftAlignIndels
+java -Xmx3g -jar /Users/bastien/bin_app/GenomeAnalysisTK-2.8-1-g932cd3a/GenomeAnalysisTK.jar \
+-R /Users/bastien/Desktop/Bastien_ACAD/NGS/Reference_genomes/REFHumanRSRS.fasta \
+-T LeftAlignIndels \
+-I ${i/Mkdup/Mkdup_Realigned} \
+-o ${i/Mkdup/Mkdup_RealignedLeft} \
+
+done
+
+
+for i in *Sort_Mkdup.bam; do
+
+#HaplotypeCaller
+java -Xmx2g -jar /Users/bastien/bin_app/GenomeAnalysisTK-2.8-1-g932cd3a/GenomeAnalysisTK.jar \
+-T HaplotypeCaller \
+-R /Users/bastien/Desktop/Bastien_ACAD/NGS/Reference_genomes/REFHumanRSRS.fasta \
+-I ${i/Mkdup/Mkdup_RealignedLeft} \
+-o ${i/Mkdup\.bam/Mkdup_RealignedLeft\.vcf} \
+done
+
+#--dbsnp dbSNP.vcf \
+#-stand_call_conf 30.0 \
+#-stand_emit_conf 10.0 \
+#[-L targets.interval_list] \
+
+java -Xmx2g -jar /Users/bastien/bin_app/GenomeAnalysisTK-2.8-1-g932cd3a/GenomeAnalysisTK.jar -T HaplotypeCaller -R /Users/bastien/Desktop/Bastien_ACAD/NGS/Reference_genomes/REFHumanRSRS.fasta -I 3REFHumanRSRS_2NoAdapt_1BCode_LP13_1_mtDNA_Indexing_1_R1_QualMap30_Sort_Mkdup.bam -o 3REFHumanRSRS_2NoAdapt_1BCode_LP13_1_mtDNA_Indexing_1_R1_QualMap30_Sort_Mkdup.vcf

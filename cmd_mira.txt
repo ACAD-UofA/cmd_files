@@ -1,0 +1,5 @@
+mira --project=initial-mapping-testpool12686A-to-RSRS --job=mapping,genome,accurate,solexa -MI:somrnl=0 -AS:nop=1 -SB:bft=fasta:bbq=30:bsn=RSRS SOLEXA_SETTINGS -CO:msr=no -SB:dsn=testpool12686A
+
+
+
+java -jar ~/bin_app/picard-tools-1.59/picard-tools-1.59/MarkDuplicates.jar I=Mullerornis_assembled_to_Apteryx_owenii_15.bam O=Mullerornis_assembled_to_Apteryx_owenii_15_Mkdup.bam AS=TRUE M=/dev/null REMOVE_DUPLICATES=TRUE VALIDATION_STRINGENCY=LENIENT

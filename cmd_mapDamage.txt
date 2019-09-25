@@ -1,0 +1,38 @@
+### MapDamage
+
+git clone https://github.com/ginolhac/mapDamage.git mapDamage
+cd mapDamage
+git submodule update --init
+sudo python setup.py install
+
+# Cython from:
+http://www.cython.org/#download
+# quick install (or read INSTALL.txt)
+sudo python setup.py install
+
+# pysam-0.6 from:
+https://code.google.com/p/pysam/downloads/detail?name=pysam-0.6.tar.gz&can=2&q=
+# then use following commands instead of 'normal' install (https://groups.google.com/forum/?fromgroups=#!topic/pysam-user-group/4Ot3pKYPiTI)
+sudo su
+export CC=llvm-gcc-4.2
+export CXX=llvm-g++-4.21
+python setup.py build
+sudo python setup.py install
+
+# R
+R
+install.packages("RcppGSL", repos='http://cran.us.r-project.org')
+install.packages("inline", repos='http://cran.us.r-project.org')
+install.packages("ggplot2", repos='http://cran.us.r-project.org')
+install.packages("gam", repos='http://cran.us.r-project.org')
+
+# GSL library through MacPorts
+sudo port install gsl
+
+
+
+# Using mapDamage2 on the cluster (break the module load line up - or you will get a segfault):
+module load  python/2.6.6 gnu/4.8.0 R/3.0.1 pysam/0.6
+module load  gsl/1.16-gnu_4.8.0 mapDamage/2.0.2
+# If not sure about which modules to load:
+module whatis mapDamage/2.0.2
